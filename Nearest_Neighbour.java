@@ -1,14 +1,15 @@
 import java.io.*;
+import java.util.*;
 import java.awt.Color;
 import java.awt.image.*;
 import javax.imageio.*;
 
-class Zoom_Nearest_Neighbour {
+class Nearest_Neighbour {
   String meta = "";
   int width, height;
   int image[][];
 
-  public Zoom_Nearest_Neighbour(String imgLoc) {
+  public Nearest_Neighbour(String imgLoc) {
 
     try {
       BufferedReader br = new BufferedReader(new FileReader(imgLoc));
@@ -34,17 +35,17 @@ class Zoom_Nearest_Neighbour {
 
   }
 
-  public void zoomByFactor(int x, int y) {
+  public void zoomByFactor(double x, double y) {
     int px, py;
 
-    int newWidth = width * x;
-    int newHeight = height * y;
+    int newWidth = (int) (width * x);
+    int newHeight = (int) (height * y);
 
     int newImage[][] = new int[newHeight][newWidth];
 
     for (int i = 0; i < newHeight; i++)
       for (int j = 0; j < newWidth; j++) {
-        newImage[i][j] = image[(int)Math.floor(i * 1 / y)][(int)Math.floor(j * 1 / x)];
+        newImage[i][j] = image[(int) Math.floor(i * 1 / y)][(int) Math.floor(j * 1 / x)];
       }
 
     image = newImage;
@@ -81,8 +82,17 @@ class Zoom_Nearest_Neighbour {
   }
 
   public static void main(String args[]) {
-    Zoom_Nearest_Neighbour nr = new Zoom_Nearest_Neighbour("./img/cycle.pgm");
-    nr.zoomByFactor(4, 3);//width, height zoom factors
+    Nearest_Neighbour nr = new Nearest_Neighbour("./img/cycle.pgm");
+
+    Scanner sc = new Scanner(System.in);
+    System.out.print("Enter width factor: ");
+    double x = sc.nextDouble();
+    System.out.print("Enter height factor: ");
+    double y = sc.nextDouble();
+
+    sc.close();
+
+    nr.zoomByFactor(x, y);// width, height zoom factors
     nr.output();
   }
 }

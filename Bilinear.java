@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.*;
 import java.awt.Color;
 import java.awt.image.*;
 import javax.imageio.*;
@@ -34,31 +35,35 @@ class Bilinear {
 
   }
 
-  public void zoomByFactor(int x, int y) {
-    int newWidth = width * x;
-    int newHeight = height * y;
+  public void zoomByFactor(double x, double y) {
+    int newWidth = (int) ((double) width * x);
+    int newHeight = (int) ((double) height * y);
 
     int newImage[][] = new int[newHeight][newWidth];
 
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
-        newImage[i * y][j * x] = image[i][j];
+        try {
+          newImage[(int) (i * y)][(int) (j * x)] = image[i][j];
+        } catch (Exception e) {
+          continue;
+        }
       }
     }
 
     int x1, x2, y1, y2, q11, q12, q21, q22, X, Y, pixelValue;
     double fraction, intermediate;
 
-    for (int i = 0; i < newHeight - y; i++) {
-      for (int j = 0; j < newWidth - x; j++) {
+    for (int i = 0; i < newHeight; i++) {
+      for (int j = 0; j < newWidth; j++) {
         if (i % y == 0 && j % x == 0)
           continue;
         else {
           try {
-            x1 = j - j % x;
-            x2 = x1 + x;
-            y1 = i - i % y;
-            y2 = y1 + y;
+            x1 = (int) (j - j % x);
+            x2 = (int) (x1 + x);
+            y1 = (int) (i - i % y);
+            y2 = (int) (y1 + y);
 
             q11 = newImage[y1][x1];
             q12 = newImage[y1][x2];
@@ -70,14 +75,13 @@ class Bilinear {
 
             fraction = (double) 1 / ((x2 - x1) * (y2 - y1));
 
-            intermediate = fraction * (double) (q11 * (x2 - X) * (y2 - Y) + q21 * (X - x1) * (y2 - Y) + q12 * (x2 - X) * (Y - y1) + q22 * (X - x1) * (Y - y1));
+            intermediate = fraction * (double) (q11 * (x2 - X) * (y2 - Y) + q21 * (X - x1) * (y2 - Y)
+                + q12 * (x2 - X) * (Y - y1) + q22 * (X - x1) * (Y - y1));
 
             pixelValue = (int) Math.ceil(intermediate);
 
             newImage[i][j] = pixelValue;
           } catch (Exception e) {
-            System.out.println(e);
-            System.out.println("(" + i + ", " + j + ")");
             continue;
           }
         }
@@ -119,7 +123,16 @@ class Bilinear {
 
   public static void main(String args[]) {
     Bilinear nr = new Bilinear("./img/cycle.pgm");
-    nr.zoomByFactor(3, 4);//width, height zoom factors
+
+    Scanner sc = new Scanner(System.in);
+    System.out.print("Enter width factor: ");
+    double x = sc.nextDouble();
+    System.out.print("Enter height factor: ");
+    double y = sc.nextDouble();
+
+    sc.close();
+
+    nr.zoomByFactor(x, y);// width, height zoom factors
     nr.output();
   }
 }
