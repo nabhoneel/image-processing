@@ -41,34 +41,43 @@ class Bilinear {
 
     int newImage[][] = new int[newHeight][newWidth];
 
-    for (int i = 0; i < height; i++) {
-      for (int j = 0; j < width; j++) {
-        try {
-          newImage[(int) (i * y)][(int) (j * x)] = image[i][j];
-        } catch (Exception e) {
-          continue;
-        }
-      }
-    }
-
-    int x1, x2, y1, y2, q11, q12, q21, q22, X, Y, pixelValue;
-    double fraction, intermediate;
-
-    for (int i = 0; i < newHeight; i++) {
+    for (int i = 0; i < newHeight; i++)
       for (int j = 0; j < newWidth; j++) {
-        if (i % y == 0 && j % x == 0)
+        newImage[i][j] = image[(int) Math.floor(i * 1 / y)][(int) Math.floor(j * 1 / x)];
+      }
+
+    int x1, x2, y1, y2, q11, q12, q21, q22, pixelValue;
+    double fraction, intermediate, X, Y;
+
+    for (double i = 0; i < newHeight; i++) {
+      for (double j = 0; j < newWidth; j++) {
+        if (i % y == 0 && j % x == 0) {
           continue;
-        else {
+        } else {
           try {
             x1 = (int) (j - j % x);
             x2 = (int) (x1 + x);
             y1 = (int) (i - i % y);
             y2 = (int) (y1 + y);
 
+            if (x < 1 || y < 1) {
+              x1 = (int) (j * x);
+              x2 = (int) (x1 + 1);
+              y1 = (int) (i * y);
+              y2 = (int) (y1 + 1);
+            }
+
             q11 = newImage[y1][x1];
             q12 = newImage[y1][x2];
             q21 = newImage[y2][x1];
             q22 = newImage[y2][x2];
+
+            if (x < 1 || y < 1) {
+              q11 = image[x1][y1];
+              q12 = image[x1][y2];
+              q21 = image[x2][y1];
+              q22 = image[x2][y2];
+            }
 
             X = j;
             Y = i;
@@ -80,7 +89,7 @@ class Bilinear {
 
             pixelValue = (int) Math.ceil(intermediate);
 
-            newImage[i][j] = pixelValue;
+            newImage[(int) i][(int) j] = pixelValue;
           } catch (Exception e) {
             continue;
           }

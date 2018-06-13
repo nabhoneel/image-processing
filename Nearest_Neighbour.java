@@ -36,8 +36,7 @@ class Nearest_Neighbour {
   }
 
   public void zoomByFactor(double x, double y) {
-    int px, py;
-
+    
     int newWidth = (int) (width * x);
     int newHeight = (int) (height * y);
 
