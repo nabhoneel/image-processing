@@ -54,7 +54,8 @@ class Nearest_Neighbour {
 
   public void output() {
     try {
-      PrintWriter printer = new PrintWriter(new FileWriter("./img/output-zoom-nearest-neighbour.pgm"));
+      PrintWriter printer = new PrintWriter(new FileWriter("./img/output-nearest-neighbour.pgm"));
+
       printer.println(meta.split("\n")[0]);
       printer.println(meta.split("\n")[1]);
       printer.println(width + " " + height);

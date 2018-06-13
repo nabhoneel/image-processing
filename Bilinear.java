@@ -41,53 +41,30 @@ class Bilinear {
 
     int newImage[][] = new int[newHeight][newWidth];
 
-    for (int i = 0; i < newHeight; i++)
+    int q11, q12, q21, q22, pixelValue;
+    double x_top, x_bottom, X, Y;
+
+    for (int i = 0; i < newHeight; i++) {
       for (int j = 0; j < newWidth; j++) {
-        newImage[i][j] = image[(int) Math.floor(i * 1 / y)][(int) Math.floor(j * 1 / x)];
-      }
-
-    int x1, x2, y1, y2, q11, q12, q21, q22, pixelValue;
-    double fraction, intermediate, X, Y;
-
-    for (double i = 0; i < newHeight; i++) {
-      for (double j = 0; j < newWidth; j++) {
         if (i % y == 0 && j % x == 0) {
-          continue;
+          newImage[i][j] = image[(int) (i / y)][(int) (j / x)];
         } else {
           try {
-            x1 = (int) (j - j % x);
-            x2 = (int) (x1 + x);
-            y1 = (int) (i - i % y);
-            y2 = (int) (y1 + y);
+            //getting the 4 known points:
+            q11 = image[(int) (i / y)][(int) (j / x)];//top left
+            q12 = image[(int) (i / y)][(int) (j / x + 1)];//top right
+            q21 = image[(int) (i / y + 1)][(int) (j / x)];//bottom left
+            q22 = image[(int) (i / y + 1)][(int) (j / x + 1)];//bottom right
 
-            if (x < 1 || y < 1) {
-              x1 = (int) (j * x);
-              x2 = (int) (x1 + 1);
-              y1 = (int) (i * y);
-              y2 = (int) (y1 + 1);
-            }
+            //getting distance from nearest points
+            X = (double) ((j%x) / x);
+            Y = (double) ((i%y) / y);
 
-            q11 = newImage[y1][x1];
-            q12 = newImage[y1][x2];
-            q21 = newImage[y2][x1];
-            q22 = newImage[y2][x2];
-
-            if (x < 1 || y < 1) {
-              q11 = image[x1][y1];
-              q12 = image[x1][y2];
-              q21 = image[x2][y1];
-              q22 = image[x2][y2];
-            }
-
-            X = j;
-            Y = i;
-
-            fraction = (double) 1 / ((x2 - x1) * (y2 - y1));
-
-            intermediate = fraction * (double) (q11 * (x2 - X) * (y2 - Y) + q21 * (X - x1) * (y2 - Y)
-                + q12 * (x2 - X) * (Y - y1) + q22 * (X - x1) * (Y - y1));
-
-            pixelValue = (int) Math.ceil(intermediate);
+            //interpolation:
+            x_top = q11 * X + q12 * (1 - X);
+            x_bottom = q21 * X + q22 * (1 - X);
+            
+            pixelValue = (int) (x_top * Y + x_bottom * (1 - Y));
 
             newImage[(int) i][(int) j] = pixelValue;
           } catch (Exception e) {
@@ -104,7 +81,7 @@ class Bilinear {
 
   public void output() {
     try {
-      PrintWriter printer = new PrintWriter(new FileWriter("./img/output-zoom-bilinear.pgm"));
+      PrintWriter printer = new PrintWriter(new FileWriter("./img/output-bilinear.pgm"));
       printer.println(meta.split("\n")[0]);
       printer.println(meta.split("\n")[1]);
       printer.println(width + " " + height);
